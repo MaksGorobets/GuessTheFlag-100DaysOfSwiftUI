@@ -13,7 +13,10 @@ struct ContentView: View {
     
     @State private var correctAnswer = Int.random(in: 0...2)
     @State private var alertIsPresented = false
+    @State private var finalAlertIsPresented = false
     @State private var scoreTitle = ""
+    @State private var score = 0
+    @State private var gamesCount = 0
     @Environment (\.colorScheme) var colorScheme
     
     var body: some View {
@@ -24,7 +27,7 @@ struct ContentView: View {
                     Text("Guess The Flag")
                         .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
-                    Text("Score ???")
+                    Text("Score \(score)")
                         .foregroundStyle(.white)
                     Spacer()
                 VStack(spacing: 30) {
@@ -55,7 +58,12 @@ struct ContentView: View {
         .alert(scoreTitle, isPresented: $alertIsPresented) {
             Button("Continue", action: askQuestion)
         } message: {
-            Text("Your score is ???")
+            Text("Your score is \(score)")
+        }
+        .alert(scoreTitle, isPresented: $finalAlertIsPresented) {
+            Button("New Game", action: reset)
+        } message: {
+            Text("Final score: \(score)")
         }
     }
     
@@ -70,14 +78,30 @@ struct ContentView: View {
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            score += 25
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong! That's the flag of \(countiesFlags[number])"
+            if score > 25 {
+                score -= 25
+            } else {
+                score = 0
+            }
+        }
+        gamesCount += 1
+        if gamesCount >= 8 {
+            scoreTitle = "The game is over"
+            finalAlertIsPresented = true
         }
         alertIsPresented = true
     }
     func askQuestion() {
         countiesFlags.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+    func reset() {
+        score = 0
+        gamesCount = 0
+        askQuestion()
     }
 }
 
