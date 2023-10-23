@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State private var countiesFlags = ["Estonia", "France", "Germany", "Ireland", "Italy", "Monaco", "Nigeria", "Poland", "Spain", "Ukraine", "UK", "US"].shuffled()
+    @State public var countiesFlags = ["Estonia", "France", "Germany", "Ireland", "Italy", "Monaco", "Nigeria", "Poland", "Spain", "Ukraine", "UK", "US"].shuffled()
     
     @State private var correctAnswer = Int.random(in: 0...2)
     @State private var alertIsPresented = false
@@ -43,9 +43,7 @@ struct ContentView: View {
                         Button {
                             flagTapped(number)
                         } label: {
-                            Image(countiesFlags[number])
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .shadow(radius: 5)
+                            FlagView(country: countiesFlags[number])
                         }
                     }
                 }
@@ -102,6 +100,17 @@ struct ContentView: View {
         score = 0
         gamesCount = 0
         askQuestion()
+    }
+}
+
+struct FlagView: View {
+    
+    var country: String
+    
+    var body: some View {
+        Image(country)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(radius: 5)
     }
 }
 
