@@ -17,6 +17,10 @@ struct ContentView: View {
     @State private var scoreTitle = ""
     @State private var score = 0
     @State private var gamesCount = 0
+    
+    @State private var selectedFlag = [false, false, false]
+    @State private var opacityApplied = [true, true, true]
+    
     @Environment (\.colorScheme) var colorScheme
     
     var body: some View {
@@ -39,12 +43,19 @@ struct ContentView: View {
                             .font(.largeTitle.weight(.semibold))
                             .foregroundStyle(.white)
                     }
-                    ForEach(0..<3) {number in
+                    ForEach(0..<3) { number in
                         Button {
                             flagTapped(number)
+                            selectedFlag[number] = true
                         } label: {
                             FlagView(country: countiesFlags[number])
                         }
+                        .rotation3DEffect(
+                            .degrees(selectedFlag[number] ? 360 : 0), axis: (x: 0.0, y: 1.0, z: 0.0)
+                        )
+                        .opacity(opacityApplied[number] ? 1 : 0.5)
+                        .scaleEffect(opacityApplied[number] ? 1 : 0.5)
+                        .animation(.bouncy, value: opacityApplied)
                     }
                 }
                 .padding(50)
@@ -74,6 +85,10 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        
+        opacityApplied = invertArray(array: opacityApplied)
+        opacityApplied[correctAnswer] = true
+        
         if number == correctAnswer {
             scoreTitle = "Correct"
             score += 25
@@ -92,7 +107,10 @@ struct ContentView: View {
         }
         alertIsPresented = true
     }
+    
     func askQuestion() {
+        opacityApplied = [true, true, true]
+        selectedFlag = [false, false, false]
         countiesFlags.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
@@ -100,6 +118,20 @@ struct ContentView: View {
         score = 0
         gamesCount = 0
         askQuestion()
+    }
+    
+    func invertArray(array: Array<Bool>) -> Array<Bool> {
+        
+        var returnArray: Array<Bool> = []
+        
+        for index in array {
+            if index == false {
+                returnArray.append(true)
+            } else {
+                returnArray.append(false)
+            }
+        }
+        return returnArray
     }
 }
 
